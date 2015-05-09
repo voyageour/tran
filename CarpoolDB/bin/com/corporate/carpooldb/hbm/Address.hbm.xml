@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+
+	<class name="Address" table="address" lazy="true">
+		
+		<id name="addressId" column="address_id" type="long">
+		
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">address_sequence</param>
+				<param name="segment_value">address_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		
+		</id>
+						
+		<property name="singleAddress" column="combine_address" type="string"></property>				
+		<property name="flatNo" column="flat_no" type="string"></property>
+		<property name="apartmentName" column="apartment_name" type="string"></property>
+		<property name="streetName" column="street_name" type="string"></property>
+		<property name="cityName" column="city_name" type="string"></property>
+		<property name="stateName" column="state_name" type="string"></property>
+		<property name="countryName" column="country_name" type="string"></property>
+		<property name="pincode" column="pincode" type="int"></property>
+		<property name="landMarkName" column="landmark_name" type="string"></property>
+	
+	</class>
+
+
+
+
+</hibernate-mapping>

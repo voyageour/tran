@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+      
+    
+     <class name="FeedbackUpdated" table="feedback">
+    
+       <id name="feedbackId" column="feedback_id" type="long" >
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">feedback_sequence</param>
+				<param name="segment_value">feedback_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		</id>
+	
+		<property name="feedbackContents" column="feedback" type="string" />
+		<property name="feedbackType" column="feedback_type" type="int" />
+		<property name="active" column="active" type="boolean" />
+		
+	    <many-to-one name="user" class="User" column="user_id" cascade="all" unique="true" lazy="false">
+	    </many-to-one>
+     </class>
+     
+    <query name="getFeedbackByType">
+		<![CDATA[
+      		from com.corporate.carpooldb.dto.FeedbackUpdated as feedbackUpdated where feedbackUpdated.feedbackType = :feedbackType 
+    	]]>
+	</query>
+
+
+    <query name="getActiveFeedbackByType">
+		<![CDATA[
+      		from com.corporate.carpooldb.dto.FeedbackUpdated as feedbackUpdated where feedbackUpdated.feedbackType = :feedbackType and feedbackUpdated.active is true 
+    	]]>
+	</query>
+
+
+    <query name="getAllFeedback">
+		<![CDATA[
+      		from com.corporate.carpooldb.dto.FeedbackUpdated as feedbackUpdated 
+    	]]>
+	</query>
+     
+    <query name="getAllActiveFeedback">
+		<![CDATA[
+      		from com.corporate.carpooldb.dto.FeedbackUpdated as feedbackUpdated where feedbackUpdated.active is true
+    	]]>
+	</query>
+      
+     
+</hibernate-mapping>

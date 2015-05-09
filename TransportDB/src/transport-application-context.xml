@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans"
+					  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+					  xmlns:p="http://www.springframework.org/schema/p"
+					  xmlns:beans="http://www.springframework.org/schema/beans"
+					  xmlns:tx="http://www.springframework.org/schema/tx"
+					  xmlns:context="http://www.springframework.org/schema/context" 
+					  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+													 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+													 http://www.springframework.org/schema/tx 
+													 http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+													 http://www.springframework.org/schema/context
+													 http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+													 
+	<!-- Configure annotated beans --> 
+   <!-- <context:annotation-config />
+     <context:component-scan base-package="com.corporate." /> 
+ 	 <context:property-placeholder location="classpath*:transport.properties" />-->
+	 <context:annotation-config />
+     <tx:annotation-driven/>
+
+    
+	<!-- Here we pass all the Hibernate Mapping XML files which will be loaded by Hibernate -->
+    <bean id="sessionFactoryTransport" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="annotatedClasses">
+			<list>
+				
+				<value>com.corporate.transportdb.dto.updated.DriverUpdated</value>
+				<value>com.corporate.transportdb.dto.updated.DriverVehicleMappingUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.News</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.Permission</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.PlaceUpdated</value>
+				<value>com.corporate.transportdb.dto.updated.Role</value>
+				<value>com.corporate.transportdb.dto.updated.RouteDriverVehicleMappingUpdated</value>
+				<value>com.corporate.transportdb.dto.updated.RoutePlaceMappingUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.RouteUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.Status</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.UserRouteMappingForNightCabUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.UserRouteMappingUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.UserUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.VehicleUpdated</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.PassRequestStatus</value>
+ 		   	 	<value>com.corporate.transportdb.dto.updated.UserRequestNew</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.BusFare</value>
+		   	 	<value>com.corporate.transportdb.dto.updated.FeedbackUpdated</value>
+			</list>
+		</property>
+
+         <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect"><!--Which dialect is used of hibernate according to type of underlying database-->
+                    org.hibernate.dialect.MySQLDialect
+                </prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+        <property name="dataSource"><ref bean="dataSourceTransport"/></property> 
+        
+    </bean>
+    
+    <beans:bean id="dataSourceTransport" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <beans:property name="driverClassName"><beans:value>${transport.db.driverClassName}</beans:value></beans:property>
+        <beans:property name="url"><beans:value>${transport.db.url}</beans:value></beans:property>
+        <beans:property name="username"><beans:value>${transport.db.username}</beans:value></beans:property>
+        <beans:property name="password"><beans:value>${transport.db.password}</beans:value></beans:property>
+        <beans:property name="testOnBorrow"><beans:value>true</beans:value></beans:property>
+        <beans:property name="testOnReturn"><beans:value>true</beans:value></beans:property>
+        <beans:property name="validationQuery"><beans:value>select 1</beans:value></beans:property>
+        <beans:property name="maxIdle"><beans:value>-1</beans:value></beans:property>
+        <beans:property name="maxActive"><beans:value>-1</beans:value></beans:property>
+        <beans:property name="maxOpenPreparedStatements"><beans:value>-1</beans:value></beans:property>
+        <beans:property name="maxWait"><beans:value>30000</beans:value></beans:property>
+    </beans:bean>
+
+   	<!--Hibernate's transaction manager used for handling database transactions/manipulating data happening-->
+	<bean id="transactionManagerTransport"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+		<property name="sessionFactory">
+			<ref bean="sessionFactoryTransport" />
+		</property>
+	</bean>
+	
+
+   	
+	<bean id="transportServiceImplUpdated" class="com.corporate.transportdb.backend.TransportServiceImplUpdated">
+		<property name="sessionFactory">
+			<ref bean="sessionFactoryTransport" />
+		</property>
+	</bean>
+ 
+</beans>													 

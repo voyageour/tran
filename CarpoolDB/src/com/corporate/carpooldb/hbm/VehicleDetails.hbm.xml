@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+      
+     <class name="VehicleDetails" table="vehicle">
+    
+       <id name="vehicalId" column="vehicle_id" type="long" >
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">vehicle_details_sequence</param>
+				<param name="segment_value">vehicle_details_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		</id>
+	
+		<property name="vehicleType" column="vehicle_type" type="int" />
+		<property name="vehicleRegisteredNumber" column="vehicle_registered_number" type="string" />
+		<property name="drivingLicenceNumber" column="driving_licence_number" type="string" />
+		<property name="vehicleColor" column="vehicle_color" type="string" />
+		
+     </class>
+     
+</hibernate-mapping>

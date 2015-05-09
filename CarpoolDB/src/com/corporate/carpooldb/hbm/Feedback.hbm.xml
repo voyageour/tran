@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+      
+     <class name="Feedback" table="feedback">
+    
+       <id name="feedbackId" column="feedback_id" type="long" >
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">feedback_sequence</param>
+				<param name="segment_value">feedback_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		</id>
+	
+		<property name="feedback" column="feedback" type="string" />
+		<property name="user" column="user_id" type="string" />
+     </class>
+     
+</hibernate-mapping>

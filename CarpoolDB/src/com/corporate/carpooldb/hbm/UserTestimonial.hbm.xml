@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+
+	<class name="UserTestimonial" table="user_testimonial" lazy="true">
+
+		<id name="userTestimonialId" column="user_testimonial_id" type="int">
+			
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">user_testimonial_sequence</param>
+				<param name="segment_value">user_testimonial_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+
+		</id>
+
+		<property name="feedbackType" column="feedback_type" type="int" />
+		<many-to-one name="user" column="user_id" class="User" unique="true" lazy="false"/>
+		
+		<!--  <many-to-one name="testimonial" column="testimonial_id" class="Testimonial" unique="true" lazy="false"/> -->
+        
+	</class>
+
+	<query name="findTestimonialByUserName">
+	    <![CDATA[
+	        from com.corporate.carpooldb.dto.UserTestimonial as userTestimonial where userTestimonial.user.userName = :userName
+	    ]]>
+	</query>
+	  
+</hibernate-mapping>

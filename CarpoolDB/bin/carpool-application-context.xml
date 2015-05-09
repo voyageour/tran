@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans"
+					  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+					  xmlns:p="http://www.springframework.org/schema/p"
+					  xmlns:beans="http://www.springframework.org/schema/beans"
+					  xmlns:tx="http://www.springframework.org/schema/tx"
+					  xmlns:context="http://www.springframework.org/schema/context" 
+					  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+													 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+													 http://www.springframework.org/schema/tx 
+													 http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+													 http://www.springframework.org/schema/context
+													 http://www.springframework.org/schema/context/spring-context-2.5.xsd ">
+
+	
+	<!-- Configure annotated beans 
+    <context:component-scan base-package="com.corporate.carpooldb" />
+	<context:property-placeholder location="classpath*:server.properties" />
+	-->
+	
+	<context:annotation-config />
+    <tx:annotation-driven/>
+     
+	<!-- Here we pass all the Hibernate Mapping XML files which will be loaded by Hibernate -->
+    <bean id="sessionFactoryCarpool" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="mappingResources">
+         <list>
+	        <value>com\corporate\carpooldb\hbm\Address.hbm.xml</value>
+	         <value>com\corporate\carpooldb\hbm\Carpooler.hbm.xml</value> 
+	        <value>com\corporate\carpooldb\hbm\Permission.hbm.xml</value>
+	        <value>com\corporate\carpooldb\hbm\Place.hbm.xml</value>
+	        <value>com\corporate\carpooldb\hbm\Role.hbm.xml</value>
+	        <value>com\corporate\carpooldb\hbm\Status.hbm.xml</value>
+	        <value>com\corporate\carpooldb\hbm\User.hbm.xml</value>
+	        <value>com\corporate\carpooldb\hbm\SourceToDestinationDetails.hbm.xml</value>
+	        <!--  <value>com\corporate\carpooldb\hbm\VehicleDetails.hbm.xml</value> -->
+	        <!--  <value>com\corporate\carpooldb\hbm\Testimonial.hbm.xml</value> -->
+	        <!--  <value>com\corporate\carpooldb\hbm\UserTestimonial.hbm.xml</value> -->
+	        <value>com\corporate\carpooldb\hbm\CarpoolerPreference.hbm.xml</value>
+	        
+	        <value>com\corporate\carpooldb\hbm\FeedbackUpdated.hbm.xml</value>
+	        
+	        
+         </list>   
+         </property>
+         <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect"><!--Which dialect is used of hibernate according to type of underlying database-->
+                    org.hibernate.dialect.MySQLDialect
+                </prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+        <property name="dataSource"><ref bean="dataSourceCarpool"/></property> 
+        
+    </bean>
+    
+    
+    <beans:bean id="dataSourceCarpool" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <beans:property name="driverClassName"><beans:value>${carpool.db.driverClassName}</beans:value></beans:property>
+        <beans:property name="url"><beans:value>${carpool.db.url}</beans:value></beans:property>
+        <beans:property name="username"><beans:value>${carpool.db.username}</beans:value></beans:property>
+        <beans:property name="password"><beans:value>${carpool.db.password}</beans:value></beans:property>
+        <beans:property name="testOnBorrow"><beans:value>true</beans:value></beans:property>
+        <beans:property name="testOnReturn"><beans:value>true</beans:value></beans:property>
+        <beans:property name="validationQuery"><beans:value>select 1</beans:value></beans:property>
+        <beans:property name="maxIdle"><beans:value>-1</beans:value></beans:property>
+        <beans:property name="maxActive"><beans:value>-1</beans:value></beans:property>
+        <beans:property name="maxOpenPreparedStatements"><beans:value>-1</beans:value></beans:property>
+        <beans:property name="maxWait"><beans:value>30000</beans:value></beans:property>
+    </beans:bean>
+
+   	<!--Hibernate's transaction manager used for handling database transactions/manipulating data happening-->
+	<bean id="transactionManagerCarpool"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+		<property name="sessionFactory">
+			<ref bean="sessionFactoryCarpool" />
+		</property>
+	</bean>
+   	
+	<bean id="carpoolDaoImpl" class="com.corporate.carpooldb.db.CarpoolDaoImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactoryCarpool" />
+		</property>
+	</bean>
+	
+		
+</beans>													 

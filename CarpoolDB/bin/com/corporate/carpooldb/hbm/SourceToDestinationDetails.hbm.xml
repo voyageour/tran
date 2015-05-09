@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+	
+	<class name="SourceToDestinationDetails" table="source_to_destination" lazy="true">
+		
+		<id name="sourceToDestinationId" column="source_to_destination_id" type="long">
+		
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">source_to_destination_sequence</param>
+				<param name="segment_value">source_to_destination_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		
+		</id>
+					 
+		<property name="sourcePlace" column="source_place" type="string"></property>
+		<property name="destinationPlace" column="destination_place" type="string"></property>
+		<property name="inBetweenPlaces" column="in_between_places" type="string"></property>
+		<property name="sourceLeavingTime" column="source_leaving_time" type="string"></property>
+		<property name="carpoolOnDays" column="carpool_on_days" type="string"></property>
+		<property name="carpoolDate" column="carpool_date" type="date"></property>
+		<property name="availability" column="availability" type="boolean"></property>	
+	    
+	      <property name="carpoolerId" column="carpooler_id" type="long" insert="false" update="false" ></property>  
+  	
+  		<!--<many-to-one name="carpoolerId" class="Carpooler" column="carpooler__id" not-null="true" cascade="all" unique="true" lazy="false"></many-to-one>-->
+  	
+	</class>
+	
+	<query name="findSourceToDestinationDetailsByCarpoolerId">
+		<![CDATA[
+		from com.corporate.carpooldb.dto.SourceToDestinationDetails as std where std.carpoolerId = :carpoolerId
+    ]]>
+	</query>
+	
+
+</hibernate-mapping>

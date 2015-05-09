@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+
+	<class name="Carpooler" table="carpooler" lazy="true">
+		
+		<id name="carpoolerId" column="carpooler_id" type="long">
+		
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">carpooler_sequence</param>
+				<param name="segment_value">carpooler_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		
+		</id>
+					 							      
+		<property name="availability" column="availability" type="boolean"></property>
+		<property name="userType" column="user_type" type="string"></property>
+
+		<!--
+		<bag name="listOfVehicleDetails" cascade="all" lazy="false">
+            <key column="carpooler_id" not-null="true" />
+            <one-to-many class="VehicleDetails" />
+        </bag>
+		-->
+		
+		<bag name="listOfSourceToDestinationDetails" cascade="all" lazy="false">
+            <key column="carpooler_id" not-null="true" />
+            <one-to-many class="SourceToDestinationDetails" />
+        </bag>
+        
+        <property name="carpoolerCreationDate" column="created_date" type="timestamp"></property>        
+        <many-to-one name="user" class="User" column="user_id" not-null="true" unique="true" lazy="false"></many-to-one>
+		<!--  <many-to-one name="carpoolerPreference" class="CarpoolerPreference" column="carpooler_preference_id" not-null="true" cascade="all" unique="true" lazy="false"></many-to-one> -->		
+		
+	</class>
+
+	<query name="getCarpoolerByUser">
+		<![CDATA[
+      from com.corporate.carpooldb.dto.Carpooler as carpooler where carpooler.user=:user
+    ]]>
+	</query>
+
+	<query name="findTopTenCarpooler">
+		<![CDATA[
+      from com.corporate.carpooldb.dto.Carpooler as carpooler order by userCreationDate
+    ]]>
+	</query>
+
+	<query name="findExactMatchingCarpooler">
+		<![CDATA[
+		Select c,std from com.corporate.carpooldb.dto.Carpooler as c, com.corporate.carpooldb.dto.SourceToDestinationDetails as std 
+		where upper(std.sourcePlace)=upper(:source) and upper(std.destinationPlace)=upper(:destination) and c.carpoolerId = std.carpoolerId
+    ]]>
+	</query>
+
+	<query name="findInBetweenMatchingCarpooler">
+		<![CDATA[
+		Select c from com.corporate.carpooldb.dto.Carpooler as c, com.corporate.carpooldb.dto.SourceToDestinationDetails as std 
+		where std.inBetweenPlaces like :source and std.inBetweenPlaces like :destination and c.carpoolerId = std.carpoolerId
+    ]]>
+	</query>
+	
+	<query name="findApproximateExactMatchCarpooler">
+		<![CDATA[  
+		select c,std from com.corporate.carpooldb.dto.Carpooler as c, com.corporate.carpooldb.dto.SourceToDestinationDetails as std 
+		where ( upper(std.sourcePlace)=upper(:source1) or upper(std.inBetweenPlaces) like upper(:source2) ) 
+		and ( upper(std.destinationPlace)=upper(:destination1) or upper(std.inBetweenPlaces) like upper(:destination2) ) 
+		and ( upper(std.sourcePlace)=upper(:destination1) or upper(std.inBetweenPlaces) like upper(:destination2) ) 
+		and ( upper(std.sourcePlace)!=upper(:source3) or upper(std.destinationPlace)!=upper(:destination3) ) 
+		and c.carpoolerId = std.carpoolerId
+    ]]>
+	</query>
+
+	<query name="findCarpoolerByCarpoolerId">
+		<![CDATA[
+		from com.corporate.carpooldb.dto.Carpooler as c where c.carpoolerId = :carpoolerId
+    ]]>
+	</query>
+	
+	
+	<query name="findMatchingCarpoolerInSourceAndInBetweenPlace">
+		<![CDATA[
+		Select std from com.corporate.carpooldb.dto.SourceToDestinationDetails as std 
+		where (std.sourcePlace like :source1) or (std.inBetweenPlaces like :source2) 
+    ]]>
+	</query>
+
+	<query name="findMatchingCarpoolerInDestinationAndInBetweenPlace">
+		<![CDATA[
+		Select std from com.corporate.carpooldb.dto.SourceToDestinationDetails as std 
+		where  (std.destinationPlace like :destination1) or (std.inBetweenPlaces like :destination2)
+    ]]>
+	</query>
+	
+	
+</hibernate-mapping>

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.corporate.carpooldb.dto">
+
+	<typedef class="com.corporate.carpooldb.hibernate.TinyIntegerToBoolean" name="tinyint_boolean"/>
+	
+	<class name="User" table="user" lazy="true">
+
+		<id name="userId" column="user_id" type="long">
+		
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="table_name">sequences</param>
+				<param name="sequence_name">user_sequence</param>
+				<param name="segment_value">user_sequence</param>
+				<param name="next_val">next_val</param>
+				<param name="initial_value">5</param>
+				<param name="increment_size">5</param>
+			</generator>
+		
+		</id>
+
+		<property name="userName" column="user_name" type="string"></property>
+		<property name="password" column="password" type="string"></property>
+		
+		<property name="gender" column="gender" type="int"></property>
+		<property name="dob" column="dob" type="date"></property>
+		
+		<property name="emailId" column="email_id" type="string"></property>
+		<property name="primaryContactNumber" column="primary_contact_number" type="string"></property>
+		<property name="secondaryContactNumber" column="secondary_contact_number" type="string"></property>
+		<property name="userCreationDate" column="created_date" type="timestamp"></property>
+		<property name="userProfilePic" column="user_pic_url" type="string"></property>
+		
+		<property name="activationLink" column="activation_link" type="string"></property>
+		
+		<many-to-one name="role" class="Role" unique="true" column="role_id" lazy="false" cascade="all"></many-to-one>
+		<many-to-one name="status" class="Status" unique="true" column="status_id" lazy="false" cascade="all"></many-to-one>
+		<many-to-one name="address" class="Address" unique="true" column="address_id" lazy="false" cascade="all"></many-to-one>
+		
+	</class>
+
+	<query name="findUserByName">
+		<![CDATA[
+      from com.corporate.carpooldb.dto.User as user where upper(user.userName)=upper(:username)
+    ]]>
+	</query>
+	
+	<query name="findUserByEmailId">
+		<![CDATA[
+      from com.corporate.carpooldb.dto.User as user where upper(user.emailId)=upper(:emailId)
+    ]]>
+	</query>
+	
+	<query name="findUserByUserId">
+		<![CDATA[
+      from com.corporate.carpooldb.dto.User as user where upper(user.userId)=upper(:userId)
+    ]]>
+	</query>
+	
+</hibernate-mapping>
