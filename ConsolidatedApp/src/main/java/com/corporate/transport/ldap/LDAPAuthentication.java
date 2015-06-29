@@ -1,13 +1,10 @@
 package com.corporate.transport.ldap;
 
-
-
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -15,20 +12,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-import javax.naming.AuthenticationException;
-import javax.naming.CommunicationException;
+
+import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
 public class LDAPAuthentication {
 
-	public int authenticate(String username, String password)
+	public Boolean authenticate(String username, String password) throws NamingException, IOException
 	{
 		
 		Hashtable authEnv = new Hashtable();
 
-		String mcEnvKeyPath = "MC_ENV_PATH";
+/*		String mcEnvKeyPath = "MC_ENV_PATH";
 		String envPropPath = System.getenv(mcEnvKeyPath);
 		System.out.println("Path is 1 :"+envPropPath);
 		
@@ -42,60 +39,68 @@ public class LDAPAuthentication {
 		}
 		
 		System.out.println("Environment variable path to read is :"+envPropPath);
-		ResourceBundle rb = null;
-		FileInputStream fis = null;
-		int resp = 2;
+*/		ResourceBundle rb = null;
+		URL url = LDAPAuthentication.class.getResource("ldap.properties");
+		InputStream stream = LDAPAuthentication.class.getResourceAsStream("ldap.properties");
 		try {
-			File file = new File(propertyFilePath);
+			File file = new File(url.getPath());
 			if (file.exists()) {
-				fis = new FileInputStream(file);
-				rb = new PropertyResourceBundle(fis);
+				rb = new PropertyResourceBundle(stream);
 				String[] urls = rb.getString("url").split(",");
 				List ldapURLs = new ArrayList();
 				Collections.addAll(ldapURLs, urls);
-
-				authEnv.put("java.naming.factory.initial", rb.getString("INITIAL_CONTEXT_FACTORY"));
-
+				/*authEnv.put("java.naming.factory.initial", rb.getString("INITIAL_CONTEXT_FACTORY"));
 				authEnv.put("java.naming.security.authentication", rb.getString("SECURITY_AUTHENTICATION"));
-
 				authEnv.put("java.naming.security.principal", username);
 				authEnv.put("java.naming.security.credentials", password);
-
+*/
+				 String Securityprinciple = "cn="+username+","+rb.getString("UserSearch");
+				 authEnv.put(Context.INITIAL_CONTEXT_FACTORY,rb.getString("INITIAL_CONTEXT_FACTORY"));
+		         authEnv.put(Context.SECURITY_AUTHENTICATION, rb.getString("SECURITY_AUTHENTICATION"));
+		         authEnv.put(Context.SECURITY_PRINCIPAL,Securityprinciple);
+		         authEnv.put(Context.SECURITY_CREDENTIALS, password);
+				
 				Iterator itr = ldapURLs.iterator();
 
-				while (((resp == 2) || (resp == 0)) && (itr.hasNext())) {
-					authEnv.put("java.naming.provider.url", itr.next().toString());
-					resp = makeCall(authEnv);
+				while (itr.hasNext()) {
+					authEnv.put(Context.PROVIDER_URL, itr.next().toString());
+					try {
+						if(authencicate(authEnv)) {
+							return Boolean.TRUE;
+						}
+					} catch (NamingException e) {
+						throw e;
+					}
 				}
 			}
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw e;
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		} finally {
 			try {
-				if (fis != null)
-					fis.close();
+				if (stream != null) {
+					stream.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		return resp;
+		return Boolean.FALSE;
 	}
 
-	private int makeCall(Hashtable authEnv) {
+	private Boolean authencicate(Hashtable authEnv) throws NamingException {
 		System.out.println("Connecting to:" + authEnv.get("java.naming.provider.url"));
+		Boolean b = Boolean.FALSE;
 		try
 		{
 			DirContext authContext = new InitialDirContext(authEnv);
-			return 1;
-		} catch (AuthenticationException authEx) {
-			return 0;
-		} catch (CommunicationException cEx) {
-			return 2;
-		} catch (NamingException namEx) {
-			namEx.printStackTrace();
-		}return 3;
+			b = Boolean.TRUE;
+			authContext.close();
+		} catch (NamingException ex) {
+			throw ex;
+		} 
+		return b;
 	}
 }

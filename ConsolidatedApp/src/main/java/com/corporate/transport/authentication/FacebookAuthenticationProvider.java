@@ -16,37 +16,27 @@
 
 package com.corporate.transport.authentication;
 
-import java.security.Principal;
-import java.sql.DriverManager;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+
+import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
+import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.corporate.transport.ldap.LDAPAuthentication;
-import com.mysql.jdbc.Driver;
 import com.corporate.transportdb.backend.TransportServiceUpdated;
-import com.corporate.transportdb.dto.updated.UserUpdated;
 
 public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
-	
+
 	@Autowired
 	TransportServiceUpdated transportService=null;
 
@@ -58,8 +48,7 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		this.transportService = transportService;
 	}
 
-	public Authentication authenticate(Authentication authentication)
-			throws AuthenticationException {
+	public Authentication authenticate(Authentication authentication) {
 
 
 		System.out.println("FacebookAuthenticationProvider.authenticate()");
@@ -69,21 +58,11 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 		String username = auth.getName();
 		String password = (String)auth.getCredentials();
 
-		//System.out.println(username + "   " + password);
-
-		UserUpdated user = null;
-
-		int status=-1;
-
 		//TEST		
 		try{
 			System.out.println("GOING FOR VALIDATION");
 			LDAPAuthentication ldap = new LDAPAuthentication();
-			status = ldap.authenticate(username, password);
-
-			System.out.println("GOING FOR VALIDATION STATUS:"+status);
-			status=1;
-			if(status==1){
+			if(ldap.authenticate(username, password)){
 				List<GrantedAuthority> grantedAuthoritiesList = new ArrayList<GrantedAuthority>();
 
 				if(username!=null && (username.equals("patel286@avaya.com"))){
@@ -93,21 +72,25 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 				}
 
 				return new UsernamePasswordAuthenticationToken(username, null, grantedAuthoritiesList);
-
-			}else if(status==0){
-				throw new BadCredentialsException("Incorrect Email Id or Password - Jayesh");
-				
-				 
-
-			}else if(status==2){
-				throw new LDAPConnectivityException("There is some error connecting with LDAP");
 			}
 
+
 		}catch (Exception e) {
-			e.printStackTrace();
+
+			if(e instanceof AuthenticationException) {
+				throw new BadCredentialsException("Incorrect Email Id or Password - Jayesh");
+			} 
+			//TODO [SM] Add logging for specific exception
+			else if(e instanceof CommunicationException ) {
+				throw new LDAPConnectivityException("There is some error connecting with LDAP");
+			} else if(e instanceof NamingException) {
+				throw new LDAPConnectivityException("There is some error connecting with LDAP");
+			} else {
+				throw new LDAPConnectivityException("There is some error connecting with LDAP");
+			}
 		}
 
-		
+
 		//PRODUCTION		
 		/*		try{
 			System.out.println("GOING FOR VALIDATION");
@@ -142,16 +125,16 @@ public class FacebookAuthenticationProvider implements AuthenticationProvider {
 
 	}
 
-//	public boolean supports(Class<? extends Object> authentication) {
-//		boolean supports = true;
-//		return supports;
-//	}
-	
-    @Override
-    public boolean supports(Class<? extends Object> authentication) {
-    	System.out.println("INSIDE SUPPORT :"+(UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication)));
-        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
-    }
+	//	public boolean supports(Class<? extends Object> authentication) {
+	//		boolean supports = true;
+	//		return supports;
+	//	}
+
+	@Override
+	public boolean supports(Class<? extends Object> authentication) {
+		System.out.println("INSIDE SUPPORT :"+(UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication)));
+		return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+	}
 
 
 }
